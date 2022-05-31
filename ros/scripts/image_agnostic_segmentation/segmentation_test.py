@@ -26,9 +26,11 @@ def main():
     cloud_pub = rospy.Publisher('scene_point_cloud', PointCloud2, queue_size=10)
 
     req = SegmentImageRequest()
-    rgb_img_path = os.path.join(pkg_path, '../demo/rgb_images/000000.png')
+    #rgb_img_path = os.path.join(pkg_path, '../demo/rgb_images/000000.png')
+    rgb_img_path = "/home/dalal/mowito_ws/dataset/Nvidia_HOPE/hope-dataset/hope_image/test/scene_0000/0000_rgb.jpg"
     req.rgb_image = bridge.cv2_to_imgmsg(cv2.imread(rgb_img_path))
-    depth_img_path = os.path.join(pkg_path, '../demo/depth_images/000000.png')
+    #depth_img_path = os.path.join(pkg_path, '../demo/depth_images/000000.png')
+    depth_img_path = "/home/dalal/mowito_ws/dataset/Nvidia_HOPE/hope-dataset/hope_image/test/scene_0000/0000_depth.png"
     req.depth_image = bridge.cv2_to_imgmsg(cv2.imread(depth_img_path,-1)/1000)
     req.cam_K_matrix = [1390.53, 0.0, 964.957, 0.0, 1386.99, 522.586, 0.0, 0.0, 1.0]
     c_matrix = copy.deepcopy(np.array(req.cam_K_matrix)).reshape((3,3))
