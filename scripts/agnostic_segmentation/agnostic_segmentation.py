@@ -13,7 +13,7 @@ from detectron2.utils.visualizer import ColorMode
 
 
 setup_logger()  # initialize the detectron2 logger and set its verbosity level to “DEBUG”.
-
+DEVICE = "cpu"
 
 def segment_image(img, model_path):
     confidence = 0.7
@@ -27,7 +27,7 @@ def segment_image(img, model_path):
     cfg.MODEL.ROI_BOX_HEAD.CLS_AGNOSTIC_BBOX_REG = True
     cfg.MODEL.ROI_MASK_HEAD.CLS_AGNOSTIC_MASK = True
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = confidence
-    cfg.MODEL.DEVICE = 'cpu'
+    cfg.MODEL.DEVICE = "cuda"
     predictor = DefaultPredictor(cfg)
 
     predictions = predictor(img)
@@ -42,7 +42,7 @@ def draw_segmented_image(img, predictions):
                    metadata=metadata,
                    instance_mode=ColorMode.IMAGE
                    )
-    out = v.draw_instance_predictions(predictions["instances"].to("cpu"))
+    out = v.draw_instance_predictions(predictions["instances"].to(DEVICE))
     img = out.get_image()
     
     return img
@@ -56,7 +56,7 @@ def find_object_mask(img_original, object_images_path, predictions):
     sift = cv2.SIFT_create()
     bf = cv2.BFMatcher()
 
-    instances = predictions["instances"].to("cpu")
+    instances = predictions["instances"].to(DEVICE)
 
     mask_annotations = list()
 
