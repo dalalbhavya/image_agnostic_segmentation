@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from sensor_msgs.msg import Image
+from sensor_msgs.msg import CompressedImage
 from cv_bridge import CvBridge
 import cv2
 import os
@@ -27,7 +28,7 @@ def rgb_callback(rgb_img):
 
     #convert image from sensor_msgs/Image to Numpy array
     SCALE_FACTOR = 0.5
-    rgb_numpy_img = bridge.imgmsg_to_cv2(rgb_img, desired_encoding="passthrough")
+    rgb_numpy_img = bridge.compressed_imgmsg_to_cv2(rgb_img, desired_encoding="passthrough")
     rgb_numpy_img = cv2.resize(rgb_numpy_img, (int(rgb_numpy_img.shape[1]*SCALE_FACTOR), int(rgb_numpy_img.shape[0]*SCALE_FACTOR)))
 
     #Segment Image
@@ -44,8 +45,9 @@ def rgb_callback(rgb_img):
 
 def main():
     rospy.init_node("rgbd_subs", anonymous=True)
-    rospy.Subscriber("/camera/color/image_raw/", Image, rgb_callback)
+    rospy.Subscriber("/camera/color/image_raw/compressed", CompressedImage, rgb_callback)
 
     rospy.spin()
 if __name__ == "__main__":
+
     main()
