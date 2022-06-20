@@ -34,13 +34,14 @@ def make_predicted_objects_clouds(rgb_img, depth_img, c_matrix, predictions):
         masked_depth_img = o3d.geometry.Image(masked_depth_img)
 
         # convert image to point cloud
-        intrinsic = o3d.camera.PinholeCameraIntrinsic(rgb_img.shape[0], rgb_img.shape[1],
-                                                      c_matrix[0, 0], c_matrix[1, 1], c_matrix[0, 2], c_matrix[1, 2])
+        print(rgb_img.shape[0], rgb_img.shape[1])
+        #intrinsic = o3d.camera.PinholeCameraIntrinsic(rgb_img.shape[0], rgb_img.shape[1], 610.822998046875, 609.3736572265625, 432.04693603515625, 233.91339111328125)
+        intrinsic = o3d.camera.PinholeCameraIntrinsic(rgb_img.shape[0], rgb_img.shape[1], c_matrix[0, 0], c_matrix[1, 1], c_matrix[0, 2], c_matrix[1, 2])
         rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(masked_rgb_img, masked_depth_img,
                                                                   depth_scale=1, convert_rgb_to_intensity=False)
-        pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd, intrinsic)
-
+        pcd = o3d.geometry.PointCloud.create_from_rgbd_image(rgbd, intrinsic, project_valid_depth_only=False)
         point_clouds.append(pcd)
+        print("TEST", pcd)
 
     return point_clouds
 

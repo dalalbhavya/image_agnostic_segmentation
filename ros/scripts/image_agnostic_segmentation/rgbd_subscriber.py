@@ -22,12 +22,15 @@ from agnostic_segmentation import agnostic_segmentation
 bridge = CvBridge()
 time_taken = list()
 
+rgb_img_process = 0
+depth_img_process = 0
+
 def rgb_callback(rgb_img):
     pub = rospy.Publisher("/seg_img", Image, queue_size=10)
     rate = rospy.Rate(10)
 
     #convert image from sensor_msgs/Image to Numpy array
-    SCALE_FACTOR = 0.5
+    SCALE_FACTOR = 1
     rgb_numpy_img = bridge.compressed_imgmsg_to_cv2(rgb_img, desired_encoding="passthrough")
     rgb_numpy_img = cv2.resize(rgb_numpy_img, (int(rgb_numpy_img.shape[1]*SCALE_FACTOR), int(rgb_numpy_img.shape[0]*SCALE_FACTOR)))
 
@@ -35,13 +38,16 @@ def rgb_callback(rgb_img):
     model_path = model_path = os.path.join(pkg_path, '../models/FAT_trained_Ml2R_bin_fine_tuned.pth')
     start_time = time.time()
     predictions = agnostic_segmentation.segment_image(rgb_numpy_img, model_path)
-    time_taken.append(time.time() - start_time)
+    #time_taken.append(time.time() - start_time)
     seg_rgb_img = agnostic_segmentation.draw_segmented_image(rgb_numpy_img, predictions)
-    seg_rgb_img_msg = bridge.cv2_to_imgmsg(seg_rgb_img, encoding="rgb8")
+    seg_rgb_img_msg = bridge.cv2_to_imgmsg(seg_rgb_img, encoding="bgr8")
     
     pub.publish(seg_rgb_img_msg)
-    rospy.loginfo("Mean Time taken: " + str(np.mean(time_taken)))
-    
+    rospy.loginfo("Mean Time taken: " + str(time.time() - start_time))
+
+def depth_callback(depth_img):
+    depth_img_process = depth_img
+
 
 def main():
     rospy.init_node("rgbd_subs", anonymous=True)
